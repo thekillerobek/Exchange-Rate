@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exchange</title>
+    <style>
+        /* Стили остаются без изменений */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #777;
+            font-size: 14px;
+            margin-top: 0;
+        }
+
+        .exchange-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        select, input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .exchange-arrow {
+            font-size: 24px;
+            color: #333;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Valyuta kursi USD — UZS</h1>
+        <p class="subtitle">Ayirboshlash valyutalari orasida so'm va boshqa valyutalar</p>
+
+        <!-- Форма для конвертации валют -->
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Поле для ввода суммы -->
+            <div class="exchange-inputs">
+                <input type="number" id="text" name="text" placeholder="100" min="0" step="0.01" value="{{ amount|default:100 }}" required>
+            </div>
+
+            <!-- Выбор исходной валюты -->
+            <div class="exchange-inputs">
+                <select id="base_code" name="base_code">
+                    <option value="USD" {% if base_code == "USD" %}selected{% endif %}>USD (Amerika Qo'shma Shtatlari Dollar)</option>
+                    <option value="UZS" {% if base_code == "UZS" %}selected{% endif %}>UZS (O'zbekiston Som)</option>
+                    <option value="RUB" {% if base_code == "RUB" %}selected{% endif %}>RUB (Rossiya Rubli)</option>
+                </select>
+                <span class="exchange-arrow">⇆</span>
+                <select id="target_code" name="target_code">
+                    <option value="UZS" {% if target_code == "UZS" %}selected{% endif %}>UZS (O'zbekiston Som)</option>
+                    <option value="USD" {% if target_code == "USD" %}selected{% endif %}>USD (Amerika Qo'shma Shtatlari Dollar)</option>
+                    <option value="RUB" {% if target_code == "RUB" %}selected{% endif %}>RUB (Rossiya Rubli)</option>
+                </select>
+            </div>
+
+            <button type="submit">Aylantirish</button>
+        </form>
+
+        {% if converted_amount %}
+            <div class="result">
+                <h2>Aylantirish natijasi:</h2>
+                <p>{{ amount }} {{ base_code }} = {{ converted_amount }} {{ target_code }}</p>
+                <p>valyuta kursi: 1 {{ base_code }} = {{ conversion_rate }} {{ target_code }}</p>
+                <p>Oxirgi o'zgarish: {{ last_update }}</p>
+            </div>
+        {% elif error %}
+            <div class="result">
+                <h2>Error:</h2>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
